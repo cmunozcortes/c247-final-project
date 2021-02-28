@@ -130,3 +130,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Ignore the dataset and TensorBoard history
+/data/
+logs/
