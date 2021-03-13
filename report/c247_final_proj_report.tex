@@ -63,43 +63,59 @@ Eashan Samak\\
 Brain-computer interfaces (BCIs) provide a direct path of communication to
 measure and record brain activity. BCIs can infer human intent from these
 neural activity measurements and allow individuals who have lost motor
-functions gain control external devices without movement. %TODO: add citation
-% brain-computer interfaces: a gentle introduction by graimann & allison 
+functions gain control external devices without movement \cite{Graimann2010}.
 This technique is known as motor imagery (MI).
 
 Most BCI methods record electrical signals using electrodes
 placed on the surface of the scalp (electroencephalography, EEG), or on the
 surface of the cerebral cortex. EEG-based motor imagery (EEG MI) is one of the
 most popular techniques in BCI due to its non-invasiness, high temporal
-resolution, and portability. %TODO: add citation - brain-machine interfaces
-% from motor to mood - shanechi mm.
+resolution, and portability \cite{schalk}.
 
 Decoding of raw EEG signals for motor imagery tasks can be realized through a
-variety of methods. These methods can be classify into five main categories:
+variety of methods. These methods can be classified into five main categories:
 \begin{enumerate*}
     \item linear classifiers (e.g. support vector machine, SVM),
     \item nonlinear Bayesian classifiers (e.g. hidden Markov models HMM),
     \item nearest neighbor classifiers (e.g. $k$-nearest neighbors, KNN),
     \item neural networks, (e.g. multi-layer perception, MLP), and
-    \item combinaton of different methods using boosting or voting
-\end{enumerate*} % TODO: add citation - LSTM-based eeg classification... p.wang
+    \item combinaton of different methods using boosting or voting.
+\end{enumerate*} \cite{wang}
 
 Generally, these methods require pre-processing of the data to overcome low
-signal-to-noise ratios (SNR) typical of these recordings. %TODO: add citation -
-%ML for MEG during speech tasks, kostas et al.
+signal-to-noise ratios (SNR) typical of these recordings
+\cite{kostas2019machine}.
 A variety of pre-processing techniques exist to extract useful features from the
 data. Popular techniques include cropping, trial averaging, normalization,
 band-pass filtering, and spatial transforms such as common spatial patterns
 (CSP). One shortcoming of this approach is that the expert knowledge these
 techniques require can introduce bias and may reinforce underlying assumptions
-about the data. %TODO: add citation - kostas et al again.
+about the data \cite{kostas2019machine}.
 In contrast, neural networks have the ability to learn representations of the
 raw data without any pre-processing steps and can consider potentially unknown
-correlations in the data. %TODO: kostas et al.
+correlations in the data \cite{kostas2019machine}.
 
+In this project, we implemented three neural network architectures:
+a shallow and a deep convolutional neural network based on the work by
+Schirrmeister \etal in \cite{DBLP}, and an end-to-end architecture consisting of a
+CNN and an LSTM layer with attention mechanism based on the work by Kostas \etal
+in \cite{kostas2019machine}.
 
-
+Both models were trained using the ``Four class motor imagery (001-2014)''
+dataset from the BCI Competition IV (dataset 2a) \cite{brunner2008bci}. This dataset consists
+of EEG data from 9 subjects who were asked to imagine moving their left hand
+(class 1), right hand (class 2), both feet (class 3), and tongue (class 4).
+The data contains 22 channels corresponding to twenty two electrodes that were
+used to record the EEG. The signals were sampled at 250 Hz, band-pass filtered
+between 0.5 Hz and 100 Hz, and notch filtered at 50 Hz for line noise
+supression.
+Two sessions were recorded on different days for each subject. Each session
+consisted of 6 runs of 48 trials (12 for each one of the four classes), giving a
+total of 288 trials per subject on each session. Specifically, the dataset
+provided for this project included data for 2558 trials which we assume
+corresponds to the data from one of the two sessions minus trials with bad data.
 % Add the idea below to the conclusions
+
 %In practice, however, this is difficult to achieve. The reason is that
 %extracting features to express raw EEG signals in a form suitable for a neural
 %network is not a trivial task. 
@@ -110,7 +126,7 @@ All manuscripts must be in English.
 
 \subsection{Data Augmentation}
 
-\subsubsection{\Mu and \Beta Band Filtering}
+\subsubsection{$\mu$ and $\beta$ Band Filtering}
 
 % Chris 03/06: I found a paper where they use a 5th order butterworth filter to
 % extract the mu band (8-13Hz) and the beta band (13-30Hz), which correspond to
@@ -122,13 +138,13 @@ All manuscripts must be in English.
 
 BCI research has shown that Event-Related Synchronization (ERS) and
 Event-Related Desynchronization (ERD) are highly correlated with motion and have
-high activity in the $\Mu$ band (8Hz to 13Hz) and $\Beta$ band (13Hz to 30Hz).
+high activity in the $\mu$ band (8Hz to 13Hz) and $\beta$ band (13Hz to 30Hz).
 % TODO quote the right paper (I think the one above)
 Convolutional filter sizes at the first layer were chosen to capture features of
-these frequencies, but a data augmentation strategy to present the $\Mu$ and
-$\Beta$ bands was attempted. This strategy copied the 22 EEG channels, one set
-with a 6th-order Butterworth filter around the $\Mu$ frequency and another set
-with a 6th-order Butterworth filter around the $\Beta$ frequency. The unfiltered
+these frequencies, but a data augmentation strategy to present the $\mu$ and
+$\beta$ bands was attempted. This strategy copied the 22 EEG channels, one set
+with a 6th-order Butterworth filter around the $\mu$ frequency and another set
+with a 6th-order Butterworth filter around the $\beta$ frequency. The unfiltered
 set and two filtered sets were concatenated to generate a $(66 \times 1000)$
 sized sample. This was tried against three separate architectures - a deep CNN,
 shallow CNN, and CNN+LSTM. All three models experienced either the same
@@ -144,9 +160,6 @@ with time.
 % examples was increased by a factor of 10,
 
 \section{Discussion}
-
-Please refer to the author guidelines on the CVPR 2015 web page for a
-discussion of the policy on dual submissions.
 
 \begin{figure}[t]
 \begin{center}
@@ -170,28 +183,6 @@ Compare the following:\\
 \end{tabular}\\
 See The \TeX book, p165.
 
-The space after \eg, meaning ``for example'', should not be a
-sentence-ending space. So \eg is correct, {\em e.g.} is not.  The provided
-\verb'\eg' macro takes care of this.
-
-When citing a multi-author paper, you may save space by using ``et alia'',
-shortened to ``\etal'' (not ``{\em et.\ al.}'' as ``{\em et}'' is a complete word.)
-However, use it only when there are three or more authors.  Thus, the
-following is correct: ``
-   Frobnication has been trendy lately.
-   It was introduced by Alpher~\cite{Alpher02}, and subsequently developed by
-   Alpher and Fotheringham-Smythe~\cite{Alpher03}, and Alpher \etal~\cite{Alpher04}.''
-
-This is incorrect: ``... subsequently developed by Alpher \etal~\cite{Alpher03} ...''
-because reference~\cite{Alpher03} has just two authors.  If you use the
-\verb'\etal' macro provided, then you need not worry about double periods
-when used at the end of a sentence as in Alpher \etal.
-
-For this citation style, keep multiple citations in numerical (not
-chronological) order, so prefer \cite{Alpher03,Alpher02,Authors14} to
-\cite{Alpher02,Alpher03,Authors14}.
-
-
 \begin{figure*}
 \begin{center}
 \fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
@@ -202,23 +193,8 @@ chronological) order, so prefer \cite{Alpher03,Alpher02,Authors14} to
 
 \subsection{Footnotes}
 
-Please use footnotes\footnote {This is what a footnote looks like.  It
-often distracts the reader from the main flow of the argument.} sparingly.
-Indeed, try to avoid footnotes altogether and include necessary peripheral
-observations in
-the text (within parentheses, if you prefer, as in this sentence).  If you
-wish to use a footnote, place it at the bottom of the column on the page on
-which it is referenced. Use Times 8-point type, single-spaced.
 
-
-%-------------------------------------------------------------------------
 \section{References}
-
-List and number all bibliographical references in 9-point Times,
-single-spaced, at the end of your paper. When referenced in the text,
-enclose the citation number in square brackets, for
-example~\cite{Authors14}.  Where appropriate, include the name(s) of
-editors of referenced books.
 
 \begin{table}
 \begin{center}
@@ -234,16 +210,6 @@ Ours & Makes one's heart Frob\\
 \end{center}
 \caption{Results.   Ours is better.}
 \end{table}
-
-When placing figures in \LaTeX, it's almost always best to use
-\verb+\includegraphics+, and to specify the  figure width as a multiple of
-the line width as in the example below
-{\small\begin{verbatim}
-   \usepackage[dvips]{graphicx} ...
-   \includegraphics[width=0.8\linewidth]
-                   {myfile.eps}
-\end{verbatim}
-}
 
 {\small
 \bibliographystyle{ieee}
