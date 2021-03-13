@@ -108,6 +108,41 @@ correlations in the data. %TODO: kostas et al.
 
 All manuscripts must be in English.
 
+\subsection{Data Augmentation}
+
+\subsubsection{\Mu and \Beta Band Filtering}
+
+% Chris 03/06: I found a paper where they use a 5th order butterworth filter to
+% extract the mu band (8-13Hz) and the beta band (13-30Hz), which correspond to
+% ERD and ERS (Event-related desynchronization and event-related
+% synchronization) [don't ask me what those mean]. The paper trains a model with
+% our data. Just throwing this out there.
+% Mark: Is this it??
+% https://hal.archives-ouvertes.fr/file/index/docid/837516/filename/Template.pdf
+
+BCI research has shown that Event-Related Synchronization (ERS) and
+Event-Related Desynchronization (ERD) are highly correlated with motion and have
+high activity in the $\Mu$ band (8Hz to 13Hz) and $\Beta$ band (13Hz to 30Hz).
+% TODO quote the right paper (I think the one above)
+Convolutional filter sizes at the first layer were chosen to capture features of
+these frequencies, but a data augmentation strategy to present the $\Mu$ and
+$\Beta$ bands was attempted. This strategy copied the 22 EEG channels, one set
+with a 6th-order Butterworth filter around the $\Mu$ frequency and another set
+with a 6th-order Butterworth filter around the $\Beta$ frequency. The unfiltered
+set and two filtered sets were concatenated to generate a $(66 \times 1000)$
+sized sample. This was tried against three separate architectures - a deep CNN,
+shallow CNN, and CNN+LSTM. All three models experienced either the same
+performance with this augmentation or a degradation in performance. This
+indicates that either these frequencies were unimportant or the model was
+able to learn filters to distinguish features in these frequencies. Future work
+may want to change the extra features to a measurement of power in these bands
+with time.
+
+% Another failed attempt at data augmentation was generating extra examples with
+% Additive White Gaussian Noise (AWGN.) This was intended to help mitigate the
+% sever overfitting issues of early deep convolutional networks. The number of
+% examples was increased by a factor of 10,
+
 \section{Discussion}
 
 Please refer to the author guidelines on the CVPR 2015 web page for a
