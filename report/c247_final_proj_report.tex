@@ -1,5 +1,4 @@
 \documentclass[10pt,twocolumn,letterpaper]{article}
-
 \usepackage{cvpr}
 \usepackage{times}
 \usepackage{epsfig}
@@ -60,18 +59,18 @@ Eashan Samak\\
 
 %%%%%%%%% BODY TEXT
 \section{Introduction}
+% TODO remove background on BCIs and the EEG classification problem per project
+% guidelines
 Brain-computer interfaces (BCIs) provide a direct path of communication to
 measure and record brain activity. BCIs can infer human intent from these
 neural activity measurements and allow individuals who have lost motor
 functions gain control external devices without movement \cite{Graimann2010}.
 This technique is known as motor imagery (MI).
-
 Most BCI methods record electrical signals using electrodes
 placed on the surface of the scalp (electroencephalography, EEG), or on the
 surface of the cerebral cortex. EEG-based motor imagery (EEG MI) is one of the
 most popular techniques in BCI due to its non-invasiness, high temporal
 resolution, and portability \cite{schalk}.
-
 Decoding of raw EEG signals for motor imagery tasks can be realized through a
 variety of methods. These methods can be classified into five main categories:
 \begin{enumerate*}
@@ -95,20 +94,50 @@ In contrast, neural networks have the ability to learn representations of the
 raw data without any pre-processing steps and can consider potentially unknown
 correlations in the data \cite{kostas2019machine}.
 
-In this project, we implemented three neural network architectures:
-a shallow and a deep convolutional neural network based on the work by
-Schirrmeister \etal in \cite{DBLP}, and an end-to-end architecture consisting of a
-CNN and an LSTM layer with attention mechanism based on the work by Kostas \etal
-in \cite{kostas2019machine}.
+In this project, we implemented several neural network architectures to examine
+their performance on EEG classification, and attempted several pre-processing
+techniques to improve performance of one of the models.
 
-Both models were trained using the ``Four class motor imagery (001-2014)''
-dataset from the BCI Competition IV (dataset 2a) \cite{brunner2008bci}. This dataset consists
-of EEG data from 9 subjects who were asked to imagine moving their left hand
-(class 1), right hand (class 2), both feet (class 3), and tongue (class 4).
+The first model implemented was a shallow convolutional neural network
+based on the work by Schirrmeister \etal in \cite{DBLP}. There were two main
+reasons for implementing this model: first, it provided a strong performance
+baseline for comparison with subsequent models without requiring any manual
+feature engineering; and second, it could be augmented with other kinds of
+layers to enable us to explore more complex architectures.
+% TODO: Alon - can you add a description of your model here and correct
+% my description if it's wrong?
+
+% Chris: Commenting this out - I thought we had implemented a model based on the
+% deep CNN from the Schirrmeister paper, but it turns out we didn't
+%The second model we implemented was based on the deep CNN architecture in
+%\cite{DBLP}. This model was described by its authors as implementing a generic
+%architecture designed only with minor expert knowledge and capable of extracting
+%a wide range of features. With that in mind, we implemented a slightly modified
+%version of this model with the purpose of comparing its performance with its
+%shallow counterpart.
+
+The third model we implemented was a spatial convolutional neural network
+(SCNN) designed by Kostas \etal \cite{kostas2019machine}. This architecture
+includes multiple layers of spatial convolutions and temporal convolutions.
+These two types of layers are implemented separately so that spatial features
+are extracted independently from temporal features. The idea behind this is
+mimicking a typical feature-based pipeline consisting of spatial channel mixing
+and band-pass filtering to extract useful features.
+
+The last model we examined was an augmented version of the SCNN described above
+that added an LSTM layer and attention mechanism after the spatial and temporal
+convolutional layers. The goal of the LSTM layer with attention mechanism is to
+enable the LSTM to develop a sequential processing capability with flexibility
+to consider any combination of samples that may be appropriate, rather than
+processing the sequence temporally in a sample by sample fashion
+\cite{kostas2019machine}.
+
+All models were trained using the ``Four class motor imagery (001-2014)''
+dataset from the BCI Competition IV (dataset 2a) \cite{brunner2008bci}.
 The data contains 22 channels corresponding to twenty two electrodes that were
 used to record the EEG. The signals were sampled at 250 Hz, band-pass filtered
 between 0.5 Hz and 100 Hz, and notch filtered at 50 Hz for line noise
-supression.
+suppression.
 Two sessions were recorded on different days for each subject. Each session
 consisted of 6 runs of 48 trials (12 for each one of the four classes), giving a
 total of 288 trials per subject on each session. Specifically, the dataset
@@ -121,8 +150,13 @@ corresponds to the data from one of the two sessions minus trials with bad data.
 %network is not a trivial task. 
 
 \section{Results}
-
-All manuscripts must be in English.
+\subsection{Shallow CNN}
+\subsection{Deep CNN}
+\subsection{CNN + LSTM with Attention Layer}
+This model used an architecture based on \cite{kostas2019machine} by Kostas
+\etal. The first part consists of a \emph{spatial} summary convolutional neural
+network (SCNN), which includes multiple layers of non-linear spatial
+convolutions and temporal convolutions performed separately.  
 
 \subsection{Data Augmentation}
 
@@ -135,11 +169,12 @@ All manuscripts must be in English.
 % our data. Just throwing this out there.
 % Mark: Is this it??
 % https://hal.archives-ouvertes.fr/file/index/docid/837516/filename/Template.pdf
+% Chris: Yes, that's the one.
 
 BCI research has shown that Event-Related Synchronization (ERS) and
 Event-Related Desynchronization (ERD) are highly correlated with motion and have
-high activity in the $\mu$ band (8Hz to 13Hz) and $\beta$ band (13Hz to 30Hz).
-% TODO quote the right paper (I think the one above)
+high activity in the $\mu$ band (8Hz to 13Hz) and $\beta$ band (13Hz to 30Hz)
+\cite{yang2013subject}.
 Convolutional filter sizes at the first layer were chosen to capture features of
 these frequencies, but a data augmentation strategy to present the $\mu$ and
 $\beta$ bands was attempted. This strategy copied the 22 EEG channels, one set
