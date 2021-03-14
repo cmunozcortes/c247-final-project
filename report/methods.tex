@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
 
 \author{Alon Krauthammer, Mark Kubiak, Chris Munoz, Eashan Samak}
 \title{ECE C247 Final Project\\
@@ -10,6 +11,22 @@ Methods}
 \maketitle
 
 \section{Detailed Results}
+Table \ref{tab:acc} shows the validation accuracy and the test accuracy for each
+model we evaluated. As mentioned in the formal report, we used 20\% of the
+training set provided as validation set, and trained on the remaining 80\%.
+% TODO add some color on what was done to train the shallow model.
+
+The accuracy results for the SCNN model and the SCNN augmented with LSTM and
+attention mechanism were the best results out of five runs with the same
+training and validation split.
+We did not run $k$-fold cross validation as this would have required more
+compute power than what we had available. Additionally, the hyper-parameters
+used were the result of a handful of runs; again, since compute power was
+limited, an exhaustive grid search was not feasible. Therefore, we believe
+there's still room for improvement on the performance of this model on the BCI
+IV dataset 2a. 
+
+\subsection{Summary of Results}
 % Table with accuracy results across all subjects
 \begin{table}[ht]
 \begin{center}
@@ -49,6 +66,17 @@ SCNN+LSTM       & 0.758               & 0.765           \\
 \label{tab:subj}
 \end{table}
 
+\subsection{Loss and Accuracy Plots}
+Figure \ref{fig:lstm} shows the accuracy and loss over training epochs for the
+SCNN+LSTM model. The plot shows how the model begins to overfit the training
+data starting around epoch 75. Multiple attempts were made to tune the dropout
+parameter to try to reduce overfitting; however, over the limited number of
+attemps less overfitting resulted in lower test accuracy.
+\begin{figure}
+    \includegraphics[width=\linewidth]{img/rascnn.png}
+    \caption{Loss and accuracy plots for SCNN+LSTM model}
+    \label{fig:lstm}
+\end{figure}
 
 \section{Model Architectures}
 \subsection{Shallow CNN}
