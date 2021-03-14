@@ -49,6 +49,7 @@ Eashan Samak\\
 
 %%%%%%%%% ABSTRACT
 \begin{abstract}
+    % TODO write abstract!
    The ABSTRACT is to be in fully-justified italicized text, at the top
    of the left-hand column, below the author and affiliation
    information. Use the word ``Abstract'' as the title, in 12-point
@@ -60,18 +61,16 @@ Eashan Samak\\
 
 %%%%%%%%% BODY TEXT
 \section{Introduction}
-% TODO remove background on BCIs and the EEG classification problem per project
-% guidelines
-Brain-computer interfaces (BCIs) provide a direct path of communication to
-measure and record brain activity. BCIs can infer human intent from these
-neural activity measurements and allow individuals who have lost motor
-functions gain control external devices without movement \cite{Graimann2010}.
-This technique is known as motor imagery (MI).
-Most BCI methods record electrical signals using electrodes
-placed on the surface of the scalp (electroencephalography, EEG), or on the
-surface of the cerebral cortex. EEG-based motor imagery (EEG MI) is one of the
-most popular techniques in BCI due to its non-invasiness, high temporal
-resolution, and portability \cite{schalk}.
+%Brain-computer interfaces (BCIs) provide a direct path of communication to
+%measure and record brain activity. BCIs can infer human intent from these
+%neural activity measurements and allow individuals who have lost motor
+%functions gain control external devices without movement \cite{Graimann2010}.
+%This technique is known as motor imagery (MI).
+%Most BCI methods record electrical signals using electrodes
+%placed on the surface of the scalp (electroencephalography, EEG), or on the
+%surface of the cerebral cortex. EEG-based motor imagery (EEG MI) is one of the
+%most popular techniques in BCI due to its non-invasiness, high temporal
+%resolution, and portability \cite{schalk}.
 Decoding of raw EEG signals for motor imagery tasks can be realized through a
 variety of methods. These methods can be classified into five main categories:
 \begin{enumerate*}
@@ -90,14 +89,19 @@ data. Popular techniques include cropping, trial averaging, normalization,
 band-pass filtering, and spatial transforms such as common spatial patterns
 (CSP). One shortcoming of this approach is that the expert knowledge these
 techniques require can introduce bias and may reinforce underlying assumptions
-about the data \cite{kostas2019machine}.
+about the data.
 In contrast, neural networks have the ability to learn representations of the
 raw data without any pre-processing steps and can consider potentially unknown
 correlations in the data \cite{kostas2019machine}.
 
 In this project, we implemented several neural network architectures to examine
 their performance on EEG classification, and attempted several pre-processing
-techniques to improve performance of one of the models.
+techniques to verify whether performance could be improved if the models were
+fed handcrafted features as opposed to raw EEG data.
+Our ultimate goal was to analyze the performance of three different models on
+the task of subject independent classification (i.e. across all subjects on the
+dataset), and to analyze the performance of at least one model on the task of
+subject-dependent classification. 
 
 The first model implemented was a shallow convolutional neural network
 based on the work by Schirrmeister \etal in \cite{DBLP}. There were two main
@@ -123,7 +127,7 @@ includes multiple layers of spatial convolutions and temporal convolutions.
 These two types of layers are implemented separately so that spatial features
 are extracted independently from temporal features. The idea behind this is
 mimicking a typical feature-based pipeline consisting of spatial channel mixing
-and band-pass filtering to extract useful features.
+and band-pass filtering.
 
 The last model we examined was an augmented version of the SCNN described above
 that added an LSTM layer and attention mechanism after the spatial and temporal
@@ -143,9 +147,9 @@ processing the sequence temporally in a sample by sample fashion
 All models were trained using the ``Four class motor imagery (001-2014)''
 dataset from the BCI Competition IV (dataset 2a) \cite{brunner2008bci}.
 The data contains 22 channels corresponding to twenty two electrodes that were
-used to record the EEG. The signals were sampled at 250 Hz, band-pass filtered
-between 0.5 Hz and 100 Hz, and notch filtered at 50 Hz for line noise
-suppression.
+placed on the surface of the subjects' scalp.
+The signals were sampled at 250 Hz, band-pass filtered between 0.5 Hz and 100
+Hz, and notch filtered at 50 Hz for line noise suppression.
 Two sessions were recorded on different days for each subject. Each session
 consisted of 6 runs of 48 trials (12 for each one of the four classes), giving a
 total of 288 trials per subject on each session. Specifically, the dataset
@@ -157,15 +161,37 @@ the task of classification across all subjects. To this end, we split the
 training dataset with 80\% used for training and the remaining 20\% for
 validation.
 
-The validation accuracy and test accuracy for each model is shown in Table
-\ref{tab:acc} for the three models evaluated. Considering that, according to
-\cite{wang},  EEG data is in general subject dependent, these results are very
-reasonable and right in line with the classification accuracy reported in
-\cite{kostas2019machine} and \cite{DBLP}.
+In general, the accuracy of the models we
+implemented ranged from 65\% to 75\% on the test set. Considering that EEG data
+is in general subject dependent \cite{wang}, these results are very reasonable
+and right in line with the classification accuracy reported in
+\cite{kostas2019machine} and \cite{DBLP} when attempting to classify the data
+across all subjects on this dataset. Similarly, our results using the shallow
+CNN to perform subject specific classification are in line with the performance
+reported by other neural network models on this dataset \cite{wang}.
+
+The validation accuracy and test accuracy results for each model are included
+on a separate document, together with plots of the training and validation loss
+and accuracy over number of epochs.
 
 \section{Discussion}
-\subsection{Data Augmentation}
 
+In particular, our best performing model on the task of subject independent
+classification was the SCNN+LSTM with attention mechanism. 
+This result can be explained by two architectural decisions. 
+First, the inclusion of separate spatial convolutional layers and temporal
+convolutional layers, which allows the model to learn useful spatial features
+independently from temporal features. 
+Second, the inclusion of the attention mechanism, which allows the LSTM layer to
+learn what parts of the input sequence are more relevant to the task at hand. 
+Kostas \etal \cite{kostas2019machine} report a mean accuracy of 73.3\% with a
+standard deviation of 13.6\%, so our accuracy of 75\% falls within the range
+reported by authors of the model.
+
+\subsection{Pre-processing and Data Augmentation}
+We attempted several pre-processing steps and data augmentation techniques to
+try to improve the performance of our shallow CNN model. Here we discuss a
+subset of them and their effect on model performance.
 \subsubsection{$\mu$ and $\beta$ Band Filtering}
 
 % Chris 03/06: I found a paper where they use a 5th order butterworth filter to
@@ -201,27 +227,6 @@ with time.
 % Additive White Gaussian Noise (AWGN.) This was intended to help mitigate the
 % sever overfitting issues of early deep convolutional networks. The number of
 % examples was increased by a factor of 10,
-
-
-\begin{figure}[t]
-\begin{center}
-\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-   %\includegraphics[width=0.8\linewidth]{egfigure.eps}
-\end{center}
-   \caption{Example of caption.  It is set in Roman so that mathematics
-   (always set in Roman: $B \sin A = A \sin B$) may be included without an
-   ugly clash.}
-\label{fig:long}
-\label{fig:onecol}
-\end{figure}
-
-\begin{figure*}
-\begin{center}
-\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
-\end{center}
-   \caption{Example of a short caption, which should be centered.}
-\label{fig:short}
-\end{figure*}
 
 {\small
 \bibliographystyle{ieee}
