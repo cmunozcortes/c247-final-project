@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
 
 \author{Alon Krauthammer, Mark Kubiak, Chris Munoz, Eashan Samak}
 \title{ECE C247 Final Project\\
@@ -50,5 +51,89 @@ SCNN+LSTM       & 0.758               & 0.765           \\
 
 
 \section{Model Architectures}
+\subsection{Shallow CNN}
+\begin{table}[ht]
+\begin{center}
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Layer   & Output shape  & Num. of parameters \\
+        \hline\hline
+        Reshape             & $(N, 22, 500, 1)$     & 0     \\
+        Conv2D              & $(N, 22, 476, 40)$    & 1040  \\
+        Permute             & $(N, 476, 22, 40)$    & 0     \\
+        Reshape             & $(N, 476, 880)$       & 0     \\
+        Dense               & $(N, 476, 40)$        & 0     \\
+        Activation          & $(N, 476, 40)$        & 35240 \\
+        Average pooling 1D  & $(N, 27, 40)$         & 0     \\
+        Activation          & $(N, 27, 40)$         & 0     \\
+        Flatten             & $(N, 1080)$           & 0     \\
+        Dropout             & $(N, 1080)$           & 0     \\
+        Dense               & $(N, 4)$              & 4324  \\
+        \hline
+    \end{tabular}
+\end{center}
+\caption{Architecture summary for shallow CNN model.}
+\label{tab:shallow}
+\end{table}
+
+\subsection{SCNN}
+\begin{table}[ht]
+\begin{center}
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Layer   & Output shape  & Num. of parameters \\
+        \hline\hline
+        Input layer         & $(N, 1000, 22)$       & 0         \\
+        Reshape             & $(N, 1000, 22, 1)$    & 0         \\
+        Conv2D              & $(N, 1000, 12, 100)$  & 1100      \\
+        Conv2D              & $(N, 1000, 1, 100)$   & 120000    \\
+        Batch norm          & $(N, 1000, 1, 100)$   & 400       \\
+        Spatial dropout 2D  & $(N, 1000, 1, 100)$   & 0         \\
+        Conv2D              & $(N, 977, 1, 40)$     & 96000     \\
+        Conv2D              & $(N, 954, 1,40)$      & 38400     \\
+        Conv2D              & $(N, 931, 1, 40)$     & 38400     \\
+        Conv2D              & $(N, 908, 1, 40)$     & 38400     \\
+        Batch norm          & $(N, 908, 1, 40)$     & 160       \\
+        Average pooling 2D  & $(N, 45, 1, 40)$      & 0         \\
+        Spatial dropout 2D  & $(N, 45, 1, 40)$      & 0         \\
+        Flatten             & $(N, 1800)$           & 0         \\
+        Dense               & $(N, 4)$              & 7204      \\
+        \hline
+    \end{tabular}
+\end{center}
+\caption{Architecture summary for SCNN model.}
+\label{tab:scnn}
+\end{table}
+
+\subsection{SCNN+LSTM}
+\begin{table}[ht]
+\begin{center}
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Layer   & Output shape  & Num. of parameters \\
+        \hline\hline
+        Input layer         & $(N, 1000, 22)$       & 0         \\
+        Reshape             & $(N, 1000, 22, 1)$    & 0         \\
+        Conv2D              & $(N, 1000, 12, 100)$  & 1100      \\
+        Conv2D              & $(N, 1000, 1, 100)$   & 120000    \\
+        Batch norm          & $(N, 1000, 1, 100)$   & 400       \\
+        Spatial dropout 2D  & $(N, 1000, 1, 100)$   & 0         \\
+        Conv2D              & $(N, 977, 1, 40)$     & 96000     \\
+        Conv2D              & $(N, 954, 1,40)$      & 38400     \\
+        Conv2D              & $(N, 931, 1, 40)$     & 38400     \\
+        Conv2D              & $(N, 908, 1, 40)$     & 38400     \\
+        Batch norm          & $(N, 908, 1, 40)$     & 160       \\
+        Average pooling 2D  & $(N, 45, 1, 40)$      & 0         \\
+        Spatial dropout 2D  & $(N, 45, 1, 40)$      & 0         \\
+        Reshape             & $(N, 45, 40)$         & 0         \\
+        Birectional LSTM    & $(N, 45, 152)$        & 95080     \\
+        Flatten             & $(N, 6840)$           & 0         \\
+        Dense               & $(N, 4)$              & 27364     \\
+        \hline
+    \end{tabular}
+\end{center}
+\caption{Architecture summary for SCNN+LSTM model.}
+\label{tab:lstm}
+\end{table}
 
 \end{document}
