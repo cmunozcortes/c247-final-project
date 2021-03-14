@@ -7,6 +7,7 @@
 \usepackage{amssymb}
 \usepackage[inline]{enumitem}
 
+\renewcommand{\ttdefault}{cmtt}
 % Include other packages here, before hyperref.
 
 % If you comment hyperref and then uncomment it, you should delete
@@ -78,7 +79,7 @@ variety of methods. These methods can be classified into five main categories:
     \item nonlinear Bayesian classifiers (e.g. hidden Markov models HMM),
     \item nearest neighbor classifiers (e.g. $k$-nearest neighbors, KNN),
     \item neural networks, (e.g. multi-layer perception, MLP), and
-    \item combinaton of different methods using boosting or voting.
+    \item combination of different methods using boosting or voting.
 \end{enumerate*} \cite{wang}
 
 Generally, these methods require pre-processing of the data to overcome low
@@ -132,6 +133,13 @@ to consider any combination of samples that may be appropriate, rather than
 processing the sequence temporally in a sample by sample fashion
 \cite{kostas2019machine}.
 
+% Add the idea below to the conclusions
+
+%In practice, however, this is difficult to achieve. The reason is that
+%extracting features to express raw EEG signals in a form suitable for a neural
+%network is not a trivial task. 
+
+\section{Results}
 All models were trained using the ``Four class motor imagery (001-2014)''
 dataset from the BCI Competition IV (dataset 2a) \cite{brunner2008bci}.
 The data contains 22 channels corresponding to twenty two electrodes that were
@@ -143,21 +151,58 @@ consisted of 6 runs of 48 trials (12 for each one of the four classes), giving a
 total of 288 trials per subject on each session. Specifically, the dataset
 provided for this project included data for 2558 trials which we assume
 corresponds to the data from one of the two sessions minus trials with bad data.
-% Add the idea below to the conclusions
 
-%In practice, however, this is difficult to achieve. The reason is that
-%extracting features to express raw EEG signals in a form suitable for a neural
-%network is not a trivial task. 
+In the first part of our analysis, we evaluated the performance of each model on
+the task of classification across all subjects. To this end, we split the
+training dataset with 80\% used for training and the remaining 20\% for
+validation.
 
-\section{Results}
-\subsection{Shallow CNN}
-\subsection{Deep CNN}
-\subsection{CNN + LSTM with Attention Layer}
-This model used an architecture based on \cite{kostas2019machine} by Kostas
-\etal. The first part consists of a \emph{spatial} summary convolutional neural
-network (SCNN), which includes multiple layers of non-linear spatial
-convolutions and temporal convolutions performed separately.  
+The validation accuracy and test accuracy for each model is shown in Table
+\ref{tab:acc} for the three models evaluated. Considering that, according to
+\cite{wang},  EEG data is in general subject dependent, these results are very
+reasonable and right in line with the classification accuracy reported in
+\cite{kostas2019machine} and \cite{DBLP}.
 
+% Table with accuracy results across all subjects
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline
+Model           & Validation Accuracy & Test Accuracy   \\
+\hline\hline
+Shallow CNN     &                     &                 \\
+SCNN            & 0.704               & 0.654           \\
+SCNN+LSTM       & 0.758               & 0.765           \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Accuracy results over all subjects in BCI IV dataset 2a.}
+\label{tab:acc}
+\end{table}
+
+% Table with accuracy results per subject (Shallow CNN)
+\begin{table}[ht]
+\begin{center}
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Subject & Validation Accuracy   & Test Accuracy \\
+        \hline\hline
+        1       &   &   \\
+        2       &   &   \\
+        3       &   &   \\
+        5       &   &   \\
+        6       &   &   \\
+        7       &   &   \\
+        8       &   &   \\
+        9       &   &   \\
+        \hline
+    \end{tabular}
+\end{center}
+\caption{Accuracy results for each subject with Shallow CNN model.}
+\label{tab:subj}
+\end{table}
+
+\section{Discussion}
 \subsection{Data Augmentation}
 
 \subsubsection{$\mu$ and $\beta$ Band Filtering}
@@ -169,7 +214,9 @@ convolutions and temporal convolutions performed separately.
 % our data. Just throwing this out there.
 % Mark: Is this it??
 % https://hal.archives-ouvertes.fr/file/index/docid/837516/filename/Template.pdf
-% Chris: Yes, that's the one.
+% Chris: Yes, that's the one. Also, I'm thinking that maybe the details of the
+% data augmentation can go in the extra page (aka the Methods section) and keep
+% the discussion about the effects of each technique in the Discussion section.
 
 BCI research has shown that Event-Related Synchronization (ERS) and
 Event-Related Desynchronization (ERD) are highly correlated with motion and have
@@ -194,7 +241,6 @@ with time.
 % sever overfitting issues of early deep convolutional networks. The number of
 % examples was increased by a factor of 10,
 
-\section{Discussion}
 
 \begin{figure}[t]
 \begin{center}
@@ -215,21 +261,6 @@ with time.
    \caption{Example of a short caption, which should be centered.}
 \label{fig:short}
 \end{figure*}
-
-\begin{table}
-\begin{center}
-\begin{tabular}{|l|c|}
-\hline
-Method & Frobnability \\
-\hline\hline
-Theirs & Frumpy \\
-Yours & Frobbly \\
-Ours & Makes one's heart Frob\\
-\hline
-\end{tabular}
-\end{center}
-\caption{Results.   Ours is better.}
-\end{table}
 
 {\small
 \bibliographystyle{ieee}
