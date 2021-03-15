@@ -175,23 +175,53 @@ on a separate document, together with plots of the training and validation loss
 and accuracy over number of epochs.
 
 \section{Discussion}
-
-In particular, our best performing model on the task of subject independent
-classification was the SCNN+LSTM with attention mechanism. 
-This result can be explained by two architectural decisions. 
-First, the inclusion of separate spatial convolutional layers and temporal
-convolutional layers, which allows the model to learn useful spatial features
-independently from temporal features. 
-Second, the inclusion of the attention mechanism, which allows the LSTM layer to
-learn what parts of the input sequence are more relevant to the task at hand. 
-Kostas \etal \cite{kostas2019machine} report a mean accuracy of 73.3\% with a
-standard deviation of 13.6\%, so our accuracy of 75\% falls within the range
-reported by authors of the model.
-
 \subsection{Pre-processing and Data Augmentation}
 We attempted several pre-processing steps and data augmentation techniques to
-try to improve the performance of our shallow CNN model. Here we discuss a
-subset of them and their effect on model performance.
+try to improve the baseline performance of our shallow CNN model (60\%).
+These steps included input data standardization, cropping in time,
+dimensionality reduction, and band-pass filtering in the $\mu$ and $\beta$
+bands.
+
+\subsubsection{Input Standardization}
+The first notable result was that standardization of the inputs seemed to have a
+regularizing effect on the given shallow CNN model, which was initially
+overfitting quite badly. The standardization that was attempted was as follows:
+for each example, calculate the mean and variance for each of the 22 channels. 
+Then, mean-center each channel and scale to unit variance. This was performed as
+a preprocessing step rather than a regularization step, so these adjustments
+were explicitly calculated for each of the training, validation, and test
+examples. This had a clear regularizing effect, reducing overfitting and
+allowing for meaningful learning to occur for an additional ~10 training epochs,
+improving performance by roughly 2-3\%.
+
+\subsubsection{Cropping}
+The next pre-processing step that was found to be helpful was cropping the
+examples in time. With the full 1000 samples representing 4 seconds of data, we
+tried using only the first 3 seconds, as well as the last 3 seconds. It was
+clear from the performance of these two cropped models that the first second of
+data was very important, and indeed the final 1-2 seconds of each recording were
+having a slight negative impact on model performance. The best performance came
+from using only the first two seconds, or 500 samples, of each recording. This
+also reduced the size of the fully-connected layers, which may have further
+reduced overfitting and thereby been responsible for the marginally increased
+performance.
+
+\subsubsection{Dimensionality reduction}
+Additionally, we sought to pre-process the data with a PCA, reducing the number
+of channels and distilling the useful information for better model performance.
+An iterative search was performed on the standardized, cropped dataset,
+reducing the number of channels from 22 to $n$, where $n$ was varied between 6
+and 21. 
+This was performed in a nested fashion with a search over values of $p$ for
+dropout between 0.7 and 0.9. Models were trained for 150 epochs. It was found
+that PCA modestly improved model performance in general when reducing to
+between 12 and 20 channels. Best test and validation accuracy was generally
+found for 16-18 channels, but the overall best test accuracy of 73.14\% was
+achieved by a model reducing to 20 channels in pre-processing. 
+Overall, the contribution of PCA to test performance was roughly 3-4\%.
+More typical test accuracy for this model was 71-72\%.
+
+
 \subsubsection{$\mu$ and $\beta$ Band Filtering}
 
 % Chris 03/06: I found a paper where they use a 5th order butterworth filter to
@@ -201,9 +231,6 @@ subset of them and their effect on model performance.
 % our data. Just throwing this out there.
 % Mark: Is this it??
 % https://hal.archives-ouvertes.fr/file/index/docid/837516/filename/Template.pdf
-% Chris: Yes, that's the one. Also, I'm thinking that maybe the details of the
-% data augmentation can go in the extra page (aka the Methods section) and keep
-% the discussion about the effects of each technique in the Discussion section.
 
 BCI research has shown that Event-Related Synchronization (ERS) and
 Event-Related Desynchronization (ERD) are highly correlated with motion and have
@@ -227,6 +254,69 @@ with time.
 % Additive White Gaussian Noise (AWGN.) This was intended to help mitigate the
 % sever overfitting issues of early deep convolutional networks. The number of
 % examples was increased by a factor of 10,
+
+\subsection{Model Performance}
+% TODO add discussion about the shallow CNN and its performance
+A significant part of our efforts were directed towards improving the
+performance of our shallow CNN model, which reached a baseline test accuracy of
+~60\% on the task of subject-independent classification. 
+We believe most of the improvement over the baseline came from the
+pre-processing steps described on the previous sections, and regularization
+coupled with hyperparameter tuning, which we will discuss here.
+Adding dropout with a value of $p=0.8$ prior to the dense
+layer at the output (see additional \emph{Model} section for architecture
+details) had the greatest impact in reducing overfitting. 
+We added another dropout layer after the first fully-connected layer with a
+value of $p=0.6$, but this did not yield any measurable gains.
+Other items that did not yield meaningful improvements, and in some cases
+resulted in worse performance, include different choice of activation function
+and adding L1/L2 regularization.
+
+In addition to performing classification across all subjects in the dataset, we
+used this model to perform subject-specific classification. We reached two
+relevant conclusions from this work. First, that model performance varied
+greatly between subjects, with subjects 2 and 6 having the lowest accuracy. When
+removing subjects 2 and 6 from the overall dataset to train a model, this
+improved performance by ~4\% on average.
+Second, that standardization, which improved performance of the overall model,
+actually hindered performance on the per-subject models. We hypothesized that
+this is because the models were learning consistent differences in amplitudes
+per action for a given subject, but these differences were not always preserved
+from subject to subject.
+
+The last investigation we pursued using this model was multi-task training on
+action classification and subject classification. This was motivated by the
+per-subject findings above. However, a model trained on subject classification
+only, even with the standardization performed in the overall model above,
+achieved 99.8\% test accuracy, and similar validation accuracy after only a
+handful of training epochs. This experiment was not pursued due to the apparent
+triviality of subject classification on this dataset. 
+
+The second model that we implemented, the spatial convolutional neural network
+(SCNN), reached lower accuracy than the shallow CNN on the task of
+subject-independent classification; however, we did not spend a significant
+amount of time tuning hyperparameters and we only trained it with raw EEG data
+and no data augmentation techniques whatsoever.
+Considering this, the performance of this model was still reasonable, correctly
+classifying over 65\% of the test dataset.
+There were several hyperparameters we would have tuned had we had more compute
+power available and more time. Some of them would have been the number of
+filters on the spatial convolutional layers, the number of filters on the
+temporal convolutional layers, the dropout factor, and the learning rate.
+
+The SCNN+LSTM with attention mechanism was the best performing model on the task
+of subject independent classification. 
+This result can be explained by two architectural decisions. 
+First, the inclusion of separate spatial convolutional layers and temporal
+convolutional layers, which allows the model to learn useful spatial features
+independently from temporal features. 
+Second, the inclusion of the attention mechanism, which allows the LSTM layer to
+learn what parts of the input sequence are more relevant to the task at hand. 
+Kostas \etal \cite{kostas2019machine} report a mean accuracy of 73.3\% with a
+standard deviation of 13.6\%, so our accuracy of 75\% falls within the range
+reported by authors of the model.
+Amongst the hyperparameters we tuned for this model were dropout factor, choice
+of activation function, learning rate, and batch size.
 
 {\small
 \bibliographystyle{ieee}
