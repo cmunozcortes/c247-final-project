@@ -49,15 +49,19 @@ Eashan Samak\\
 
 %%%%%%%%% ABSTRACT
 \begin{abstract}
-    This project aims to classify the electroencephalograph (EEG) data
-    provided in \cite{brunner2008bci}. We explored three different
-    neural network architectures to accomplish this task: a shallow 
-    convulutional neural network (CNN), a spatial CNN (by 
-    Kostas \etal \cite{kostas2019machine}) and an SCNN with an
-    LSTM layer with attention. In addition to exploring different models,
-    we explored various pre-processing and data augmentation techniques:
-    input standardization by mean centering, cropping, dimentionality
-    reduction via PCA, and $\mu$ and $\beta$ band filtering.
+    This project aims to perform electroencephalography (EEG) classification 
+    on the BCI competition IV motor imagery dataset 2a.We explored three different 
+    neural network architectures to accomplish this task: a shallow convolutional 
+    neural network (CNN), a spatial CNN (SCNN) and an SCNN with an 
+    LSTM layer with attention. In addition to exploring different models, 
+    we explored various pre-processing and data augmentation techniques: 
+    input standardization by mean centering, cropping, dimensionality 
+    reduction via PCA, and $\mu$ and $\beta$ band filtering. In terms of accuracy, 
+    the worst performing model was the shallow CNN (our "default") 
+    network, followed by the SCNN, with the best model being the SCNN 
+    with LSTM.  PCA generally yielded a performance increase of around 3-4\%. 
+    We found that the best test accuracy of 73.14\% was achieved when we 
+    reduced the number of channels to between 16-18.
 \end{abstract}
 
 %%%%%%%%% BODY TEXT
