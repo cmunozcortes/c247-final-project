@@ -50,18 +50,19 @@ Eashan Samak\\
 %%%%%%%%% ABSTRACT
 \begin{abstract}
     This project aims to perform electroencephalography (EEG) classification 
-    on the BCI competition IV motor imagery dataset 2a.We explored three different 
-    neural network architectures to accomplish this task: a shallow convolutional 
-    neural network (CNN), a spatial CNN (SCNN) and an SCNN with an 
+    on the BCI competition IV motor imagery dataset 2a. We explored three
+    different neural network architectures to accomplish this task: a shallow
+    convolutional neural network (CNN), a spatial CNN (SCNN) and an SCNN with an 
     LSTM layer with attention. In addition to exploring different models, 
     we explored various pre-processing and data augmentation techniques: 
     input standardization by mean centering, cropping, dimensionality 
-    reduction via PCA, and $\mu$ and $\beta$ band filtering. In terms of accuracy, 
-    the worst performing model was the shallow CNN (our "default") 
-    network, followed by the SCNN, with the best model being the SCNN 
-    with LSTM.  PCA generally yielded a performance increase of around 3-4\%. 
-    We found that the best test accuracy of 73.14\% was achieved when we 
-    reduced the number of channels to between 16-18.
+    reduction via PCA, and $\mu$ and $\beta$ band filtering. In terms of 
+    accuracy, the worst performing model was the shallow CNN (our "default") 
+    network, followed by the SCNN. Our SCNN+LSTM with attention mechanism
+    reached the best test accuracy with 76\%, and our shallow CNN came in second
+    with a test accuracy of 73\%. For the latter model, dimensionality reduction
+    with PCA improved performance by roughly 3-4\%, when the dimensions were
+    reduced to 16-18 channels.
 \end{abstract}
 
 %%%%%%%%% BODY TEXT
@@ -168,18 +169,24 @@ the task of classification across all subjects. To this end, we split the
 training dataset with 80\% used for training and the remaining 20\% for
 validation.
 
-In general, the accuracy of the models we
-implemented ranged from 65\% to 75\% on the test set. Considering that EEG data
+%In general, the accuracy of the models we
+%implemented ranged from 65\% to 75\% on the test set.
+The best test accuracies for our models were as follows:
+\begin{enumerate*}
+    \item shallow CNN: 73.1\%;
+    \item SCNN: 68.8\%; and
+    \item SCNN+LSTM: 76.5\%.
+\end{enumerate*}
+Please refers to the \emph{Methods} section attached to the end of this report
+for the validation accuracy of each model.
+
+Considering that EEG data
 is in general subject dependent \cite{wang}, these results are very reasonable
 and right in line with the classification accuracy reported in
 \cite{kostas2019machine} and \cite{DBLP} when attempting to classify the data
 across all subjects on this dataset. Similarly, our results using the shallow
 CNN to perform subject specific classification are in line with the performance
 reported by other neural network models on this dataset \cite{wang}.
-
-The validation accuracy and test accuracy results for each model are included
-on a separate document, together with plots of the training and validation loss
-and accuracy over number of epochs.
 
 \section{Discussion}
 \subsection{Pre-processing and Data Augmentation}
