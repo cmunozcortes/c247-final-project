@@ -109,11 +109,13 @@ dataset), and to analyze the performance of at least one model on the task of
 subject-dependent classification. 
 
 The first model implemented was a shallow convolutional neural network
-based on the work by Schirrmeister \etal in \cite{DBLP}. There were two main
+based on the work by Schirrmeister \etal in \cite{DBLP}. There were three main
 reasons for implementing this model: first, it provided a strong performance
 baseline for comparison with subsequent models without requiring any manual
 feature engineering; and second, it could be augmented with other kinds of
-layers to enable us to explore more complex architectures.
+layers to enable us to explore more complex architectures. The final reason was that it served as a baseline for quantifying the effects of any pre-processing steps, which proved to be very significant. The only modification to this architecture, the inclusion of dropout with a value of $p=0.8$ prior to the dense
+layer at the output (see additional \emph{Model} section for architecture
+details) had the greatest impact in reducing overfitting.
 % TODO: Alon - can you add a description of your model here and correct
 % my description if it's wrong?
 
@@ -220,11 +222,7 @@ and 21.
 This was performed in a nested fashion with a search over values of $p$ for
 dropout between 0.7 and 0.9. Models were trained for 150 epochs. It was found
 that PCA modestly improved model performance in general when reducing to
-between 12 and 20 channels. Best test and validation accuracy was generally
-found for 16-18 channels, but the overall best test accuracy of 73.14\% was
-achieved by a model reducing to 20 channels in pre-processing. 
-Overall, the contribution of PCA to test performance was roughly 3-4\%.
-More typical test accuracy for this model was 71-72\%.
+between 12 and 20 channels.
 
 
 \subsubsection{$\mu$ and $\beta$ Band Filtering}
@@ -260,42 +258,32 @@ with time.
 % sever overfitting issues of early deep convolutional networks. The number of
 % examples was increased by a factor of 10,
 
-\subsection{Model Performance}
-% TODO add discussion about the shallow CNN and its performance
-A significant part of our efforts were directed towards improving the
-performance of our shallow CNN model, which reached a baseline test accuracy of
-~60\% on the task of subject-independent classification. 
-We believe most of the improvement over the baseline came from the
-pre-processing steps described on the previous sections, and regularization
-coupled with hyperparameter tuning, which we will discuss here.
-Adding dropout with a value of $p=0.8$ prior to the dense
-layer at the output (see additional \emph{Model} section for architecture
-details) had the greatest impact in reducing overfitting. 
-We added another dropout layer after the first fully-connected layer with a
-value of $p=0.6$, but this did not yield any measurable gains.
-Other items that did not yield meaningful improvements, and in some cases
-resulted in worse performance, include different choice of activation function
-and adding L1/L2 regularization.
+\subsubsection{Data Exploration and Alternate Tasks}
+
+The most significant finding during data exploration was of class imbalance in the test set - it was found that, while the training set was fairly uniform, the test set was biased towards the 'Right Hand' class. We believe that this class imbalance could have caused the dropoff in performance between validation and test sets for the model described above.
 
 In addition to performing classification across all subjects in the dataset, we
-used this model to perform subject-specific classification. We reached two
-relevant conclusions from this work. First, that model performance varied
-greatly between subjects, with subjects 2 and 6 having the lowest accuracy. When
-removing subjects 2 and 6 from the overall dataset to train a model, this
+used this model to perform subject-specific classification. First, we found that model performance varied
+greatly between subjects, with subjects 2 and 6 having the lowest accuracy. When removing subjects 2 and 6 from the overall dataset to train a model, this
 improved performance by ~4\% on average.
-Second, that standardization, which improved performance of the overall model,
-actually hindered performance on the per-subject models. We hypothesized that
+Second, standardization, which improved performance of the overall model,
+actually hindered performance on the per-subject models. We hypothesize that
 this is because the models were learning consistent differences in amplitudes
 per action for a given subject, but these differences were not always preserved
 from subject to subject.
 
-The last investigation we pursued using this model was multi-task training on
-action classification and subject classification. This was motivated by the
-per-subject findings above. However, a model trained on subject classification
-only, even with the standardization performed in the overall model above,
-achieved 99.8\% test accuracy, and similar validation accuracy after only a
-handful of training epochs. This experiment was not pursued due to the apparent
-triviality of subject classification on this dataset. 
+A model trained on subject classification only achieved 99.8\% test accuracy, and similar validation accuracy after only a handful of training epochs. This obviated any need to pursue a multi-task model on this dataset. 
+
+\subsection{Model Performance}
+% TODO add discussion about the shallow CNN and its performance
+A significant part of our efforts were directed towards improving the
+performance of our shallow CNN model, which reached a baseline test accuracy of
+~60\% on the task of subject-independent classification. Using the preprocessing steps described earlier, including PCA reducing the inputs to 16 dimensions, cropping out the final 500 samples of each example, and the per-channel standardization, allowed us to improve greatly upon this baseline. Best test and validation accuracy was generally
+found for PCA to 16-18 channels and dropout of ~0.85, but the one-off overall best test accuracy of 73.14\% was achieved by a model reducing to 20 channels. Overall, the contribution of PCA to test performance was roughly 3-4\%. More typical test accuracy for this model was 71-72\%.
+
+Besides the single-dropout approach described previously, we added another dropout layer after the first fully-connected layer with a
+value of $p=0.6$, but this did not yield any measurable gains. Changing activation function hindered performance and was not pursued further.
+
 
 The second model that we implemented, the spatial convolutional neural network
 (SCNN), reached lower accuracy than the shallow CNN on the task of
