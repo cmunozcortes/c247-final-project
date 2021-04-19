@@ -26,9 +26,9 @@ subject-dependent classification.
         \hline
         Model           & Validation Accuracy & Test Accuracy   \\
         \hline\hline
-        Shallow CNN     & 0.768               & 0.731           \\
-        SCNN            & 0.704               & 0.654           \\
-        SCNN+LSTM       & 0.758               & 0.765           \\
+        Shallow CNN w/ PCA  & 0.768               & 0.731           \\
+        SCNN                & 0.704               & 0.654           \\
+        SCNN+LSTM           & 0.758               & 0.765           \\
         \hline
     \end{tabular}
 \end{center}
@@ -56,7 +56,7 @@ subject-dependent classification.
         \hline
     \end{tabular}
 \end{center}
-\caption{Best accuracy results for each subject with Shallow CNN model.}
+\caption{Best accuracy results for each subject with Shallow CNN w/ PCA model.}
 \label{tab:subj}
 \end{table}
 
@@ -87,10 +87,10 @@ subject-dependent classification.
         \hline
         Layer   & Output shape  & Num. of parameters \\
         \hline\hline
-        Reshape             & $(N, 22, 500, 1)$     & 0     \\
-        Conv2D              & $(N, 22, 476, 40)$    & 1040  \\
-        Permute             & $(N, 476, 22, 40)$    & 0     \\
-        Reshape             & $(N, 476, 880)$       & 0     \\
+        Reshape             & $(N, 16, 500, 1)$     & 0     \\
+        Conv2D              & $(N, 16, 476, 40)$    & 1040  \\
+        Permute             & $(N, 476, 16, 40)$    & 0     \\
+        Reshape             & $(N, 476, 640)$       & 0     \\
         Dense               & $(N, 476, 40)$        & 0     \\
         Activation          & $(N, 476, 40)$        & 35240 \\
         Average pooling 1D  & $(N, 27, 40)$         & 0     \\
@@ -101,7 +101,7 @@ subject-dependent classification.
         \hline
     \end{tabular}
 \end{center}
-\caption{Architecture summary for shallow CNN model.}
+\caption{Architecture summary for Shallow CNN w/ PCA model.}
 \label{tab:shallow}
 \end{table}
 
